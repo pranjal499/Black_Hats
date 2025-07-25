@@ -5,19 +5,37 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, Plus } fro
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 const Calendar = () => {
   const currentDate = new Date();
   const monthName = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
   
-  // Mock calendar events
-  const events = [
+  const [events, setEvents] = useState([
     { date: 15, title: "AI Hackathon", type: "competition", color: "bg-primary" },
     { date: 18, title: "React Workshop", type: "workshop", color: "bg-blue-accent" },
     { date: 22, title: "Job Fair", type: "job", color: "bg-green-accent" },
     { date: 25, title: "Design Contest", type: "competition", color: "bg-purple-accent" },
     { date: 28, title: "Tech Talk", type: "event", color: "bg-primary" },
-  ];
+  ]);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: "", date: "", type: "competition" });
+
+  const handleAddEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title || !form.date) return;
+    const day = Number(form.date.split("-")[2]);
+    setEvents([
+      ...events,
+      { date: day, title: form.title, type: form.type, color: "bg-primary" },
+    ]);
+    setForm({ title: "", date: "", type: "competition" });
+    setOpen(false);
+  };
 
   const upcomingEvents = [
     {
@@ -92,10 +110,47 @@ const Calendar = () => {
               <Filter className="w-4 h-4 mr-2" />
               Filter
             </Button>
-            <Button variant="orange">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Event
-            </Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="orange">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Event</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleAddEvent} className="space-y-4">
+                  <Input
+                    placeholder="Event Title"
+                    value={form.title}
+                    onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                    required
+                  />
+                  <Input
+                    type="date"
+                    value={form.date}
+                    onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                    required
+                  />
+                  <Select value={form.type} onValueChange={value => setForm(f => ({ ...f, type: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="competition">Competition</SelectItem>
+                      <SelectItem value="workshop">Workshop</SelectItem>
+                      <SelectItem value="job">Job</SelectItem>
+                      <SelectItem value="event">Event</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <DialogFooter>
+                    <Button type="submit" variant="hero">Add Event</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </motion.div>
 

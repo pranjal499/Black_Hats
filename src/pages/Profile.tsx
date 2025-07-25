@@ -7,8 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useState } from "react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const Profile = () => {
+  const [editOpen, setEditOpen] = useState(false);
+  const [profile, setProfile] = useState({
+    name: "John Doe",
+    title: "Full Stack Developer",
+    bio: "Passionate about building scalable web apps.",
+  });
+  const [form, setForm] = useState(profile);
+
+  const handleEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfile(form);
+    setEditOpen(false);
+  };
+
   const achievements = [
     { icon: Award, name: "Competition Winner", date: "Dec 2023" },
     { icon: Star, name: "Top Performer", date: "Nov 2023" },
@@ -66,14 +84,14 @@ const Profile = () => {
                       JD
                     </AvatarFallback>
                   </Avatar>
-                  <h1 className="text-2xl font-bold text-foreground mb-2">John Doe</h1>
-                  <p className="text-muted-foreground mb-4">Full Stack Developer</p>
+                  <h1 className="text-2xl font-bold text-foreground mb-2">{profile.name}</h1>
+                  <p className="text-muted-foreground mb-4">{profile.title}</p>
                   <div className="flex justify-center space-x-2 mb-4">
                     <Badge variant="secondary">React</Badge>
                     <Badge variant="secondary">Node.js</Badge>
                     <Badge variant="secondary">Python</Badge>
                   </div>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" onClick={() => { setForm(profile); setEditOpen(true); }}>
                     <Settings className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
@@ -192,6 +210,35 @@ const Profile = () => {
       </main>
       
       <Footer />
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEdit} className="space-y-4">
+            <Input
+              placeholder="Name"
+              value={form.name}
+              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              required
+            />
+            <Input
+              placeholder="Title"
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              required
+            />
+            <Textarea
+              placeholder="Bio"
+              value={form.bio}
+              onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
+            />
+            <DialogFooter>
+              <Button type="submit" variant="hero">Save</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

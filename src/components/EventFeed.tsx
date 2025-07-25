@@ -7,18 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Grid, List, Filter, SortAsc } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export function EventFeed() {
+export function EventFeed({ searchTerm }: { searchTerm?: string }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"date" | "deadline" | "participants" | "featured">("featured");
   const [filters, setFilters] = useState<any>({});
   const [showAll, setShowAll] = useState(false);
 
+  const effectiveFilters = { ...filters };
+  if (searchTerm !== undefined) {
+    effectiveFilters.search = searchTerm;
+  }
+
   const filteredAndSortedEvents = useMemo(() => {
     let events = [...mockEvents];
 
     // Apply filters
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
+    if (effectiveFilters.search) {
+      const searchLower = effectiveFilters.search.toLowerCase();
       events = events.filter(event => 
         event.title.toLowerCase().includes(searchLower) ||
         event.description.toLowerCase().includes(searchLower) ||
@@ -27,36 +32,36 @@ export function EventFeed() {
       );
     }
 
-    if (filters.category && filters.category !== "All") {
-      events = events.filter(event => event.category === filters.category);
+    if (effectiveFilters.category && effectiveFilters.category !== "All") {
+      events = events.filter(event => event.category === effectiveFilters.category);
     }
 
-    if (filters.type && filters.type !== "All Types") {
-      events = events.filter(event => event.type === filters.type);
+    if (effectiveFilters.type && effectiveFilters.type !== "All Types") {
+      events = events.filter(event => event.type === effectiveFilters.type);
     }
 
-    if (filters.difficulty && filters.difficulty !== "All Levels") {
-      events = events.filter(event => event.difficulty === filters.difficulty);
+    if (effectiveFilters.difficulty && effectiveFilters.difficulty !== "All Levels") {
+      events = events.filter(event => event.difficulty === effectiveFilters.difficulty);
     }
 
-    if (filters.location) {
+    if (effectiveFilters.location) {
       events = events.filter(event => 
-        event.location.toLowerCase().includes(filters.location.toLowerCase())
+        event.location.toLowerCase().includes(effectiveFilters.location.toLowerCase())
       );
     }
 
-    if (filters.tags && filters.tags.length > 0) {
+    if (effectiveFilters.tags && effectiveFilters.tags.length > 0) {
       events = events.filter(event =>
-        filters.tags.some((tag: string) => event.tags.includes(tag))
+        effectiveFilters.tags.some((tag: string) => event.tags.includes(tag))
       );
     }
 
-    if (filters.dateFrom) {
-      events = events.filter(event => new Date(event.date) >= filters.dateFrom);
+    if (effectiveFilters.dateFrom) {
+      events = events.filter(event => new Date(event.date) >= effectiveFilters.dateFrom);
     }
 
-    if (filters.dateTo) {
-      events = events.filter(event => new Date(event.date) <= filters.dateTo);
+    if (effectiveFilters.dateTo) {
+      events = events.filter(event => new Date(event.date) <= effectiveFilters.dateTo);
     }
 
     // Sort events
@@ -78,7 +83,7 @@ export function EventFeed() {
     });
 
     return events;
-  }, [filters, sortBy]);
+  }, [effectiveFilters, sortBy]);
 
   const displayedEvents = showAll ? filteredAndSortedEvents : filteredAndSortedEvents.slice(0, 9);
 

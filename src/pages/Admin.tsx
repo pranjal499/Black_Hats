@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Calendar, Users, BarChart3, Settings, Plus, Bell } from "lucide-react";
@@ -6,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Admin = () => {
+  const [activePage, setActivePage] = useState("Dashboard");
   const sidebarItems = [
-    { icon: BarChart3, label: "Dashboard", active: true },
-    { icon: Calendar, label: "Events", href: "/admin/events" },
-    { icon: Users, label: "Users", href: "/admin/users" },
-    { icon: Bell, label: "Notifications", href: "/admin/notifications" },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
+    { icon: BarChart3, label: "Dashboard" },
+    { icon: Calendar, label: "Events" },
+    { icon: Users, label: "Users" },
+    { icon: Bell, label: "Notifications" },
+    { icon: Settings, label: "Settings" },
   ];
 
   const stats = [
@@ -24,7 +26,6 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
       <div className="flex">
         {/* Sidebar */}
         <motion.aside 
@@ -43,8 +44,8 @@ const Admin = () => {
               <motion.button
                 key={item.label}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                  item.active 
-                    ? "bg-primary text-primary-foreground shadow-medium" 
+                  activePage === item.label
+                    ? "bg-primary text-primary-foreground shadow-medium"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
                 initial={{ opacity: 0, x: -20 }}
@@ -52,6 +53,7 @@ const Admin = () => {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => setActivePage(item.label)}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
@@ -63,88 +65,195 @@ const Admin = () => {
         {/* Main Content */}
         <main className="flex-1 p-8">
           <motion.div
+            key={activePage}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-                <p className="text-muted-foreground">Welcome back! Here's what's happening.</p>
-              </div>
-              <Button variant="orange" size="lg" className="shadow-glow">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Event
-              </Button>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {stats.map((stat, index) => (
+            {activePage === "Dashboard" && (
+              <>
+                {/* Header */}
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+                    <p className="text-muted-foreground">Welcome back! Here's what's happening.</p>
+                  </div>
+                  <Button variant="orange" size="lg" className="shadow-glow">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Event
+                  </Button>
+                </div>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {stats.map((stat, index) => (
+                    <motion.div
+                      key={stat.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                    >
+                      <Card className="bg-gradient-card border-border/50 shadow-soft hover:shadow-medium transition-all duration-300">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium text-muted-foreground">
+                            {stat.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold text-foreground mb-1">
+                            {stat.value}
+                          </div>
+                          <p className={`text-sm ${stat.color} font-medium`}>
+                            {stat.change} from last month
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+                {/* Recent Activity */}
                 <motion.div
-                  key={stat.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
                 >
-                  <Card className="bg-gradient-card border-border/50 shadow-soft hover:shadow-medium transition-all duration-300">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
-                        {stat.title}
-                      </CardTitle>
+                  <Card className="bg-gradient-card border-border/50 shadow-soft">
+                    <CardHeader>
+                      <CardTitle>Recent Activity</CardTitle>
+                      <CardDescription>Latest events and user activities</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-foreground mb-1">
-                        {stat.value}
+                      <div className="space-y-4">
+                        {[1, 2, 3, 4].map((item, index) => (
+                          <motion.div
+                            key={item}
+                            className="flex items-center space-x-4 p-4 bg-background/50 rounded-lg border border-border/30"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                          >
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-foreground">
+                                New registration for "AI Hackathon 2024"
+                              </p>
+                              <p className="text-xs text-muted-foreground">2 minutes ago</p>
+                            </div>
+                          </motion.div>
+                        ))}
                       </div>
-                      <p className={`text-sm ${stat.color} font-medium`}>
-                        {stat.change} from last month
-                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>
-              ))}
-            </div>
-
-            {/* Recent Activity */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Card className="bg-gradient-card border-border/50 shadow-soft">
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                  <CardDescription>Latest events and user activities</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[1, 2, 3, 4].map((item, index) => (
-                      <motion.div
-                        key={item}
-                        className="flex items-center space-x-4 p-4 bg-background/50 rounded-lg border border-border/30"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                      >
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">
-                            New registration for "AI Hackathon 2024"
-                          </p>
-                          <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+              </>
+            )}
+            {activePage === "Events" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <h1 className="text-3xl font-bold text-foreground mb-4">Events</h1>
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Manage Events</CardTitle>
+                    <CardDescription>View, edit, and create events.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {["AI Hackathon 2024", "React Workshop", "Job Fair", "Design Contest"].map((event, i) => (
+                        <motion.div
+                          key={event}
+                          className="flex items-center justify-between p-4 bg-background/50 rounded-lg border border-border/30"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: i * 0.1 }}
+                        >
+                          <span className="font-medium text-foreground">{event}</span>
+                          <Button size="sm" variant="outline">Edit</Button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+                <Button variant="hero">Create New Event</Button>
+              </motion.div>
+            )}
+            {activePage === "Users" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <h1 className="text-3xl font-bold text-foreground mb-4">Users</h1>
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>User Management</CardTitle>
+                    <CardDescription>View and manage platform users.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {["Alice Johnson", "Bob Smith", "Charlie Lee", "Diana Patel"].map((user, i) => (
+                        <motion.div
+                          key={user}
+                          className="flex items-center justify-between p-4 bg-background/50 rounded-lg border border-border/30"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: i * 0.1 }}
+                        >
+                          <span className="font-medium text-foreground">{user}</span>
+                          <Button size="sm" variant="outline">View</Button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+            {activePage === "Notifications" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <h1 className="text-3xl font-bold text-foreground mb-4">Notifications</h1>
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Platform Notifications</CardTitle>
+                    <CardDescription>Recent alerts and messages.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {["System update scheduled", "New user registered", "Event deadline approaching", "Feedback received"].map((note, i) => (
+                        <motion.div
+                          key={note}
+                          className="flex items-center p-4 bg-background/50 rounded-lg border border-border/30"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: i * 0.1 }}
+                        >
+                          <span className="font-medium text-foreground">{note}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+            {activePage === "Settings" && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <h1 className="text-3xl font-bold text-foreground mb-4">Settings</h1>
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Admin Settings</CardTitle>
+                    <CardDescription>Configure your admin preferences.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-foreground">Enable notifications</span>
+                        <Button size="sm" variant="outline">Toggle</Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-foreground">Dark mode</span>
+                        <Button size="sm" variant="outline">Toggle</Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
           </motion.div>
         </main>
       </div>
-      
       <Footer />
     </div>
   );

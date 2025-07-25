@@ -3,13 +3,19 @@ import { ArrowRight, TrendingUp, Users, Award, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
-export function HeroSection() {
+export function HeroSection({ onSearch }: { onSearch: (value: string) => void }) {
+  const [searchValue, setSearchValue] = useState("");
   const stats = [
     { icon: Users, label: "Active Users", value: "50K+" },
     { icon: Award, label: "Opportunities", value: "10K+" },
     { icon: TrendingUp, label: "Success Rate", value: "95%" },
   ];
+
+  const handleSearch = () => {
+    onSearch(searchValue);
+  };
 
   return (
     <section className="relative overflow-hidden py-20 bg-gradient-to-br from-background via-blue-light/20 to-purple-light/20">
@@ -53,17 +59,21 @@ export function HeroSection() {
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
+                value={searchValue}
+                onChange={e => setSearchValue(e.target.value)}
                 placeholder="Search opportunities, companies, or skills..."
                 className="pl-12 pr-32 h-14 text-lg bg-card border-border/50 focus:border-primary focus:bg-background shadow-medium"
+                onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
               />
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: 0.96 }}
+                className="absolute right-2 top-2 h-10"
               >
                 <Button 
                   variant="hero"
                   size="lg"
-                  className="absolute right-2 top-2 h-10"
+                  onClick={handleSearch}
+                  type="button"
                 >
                   Search
                   <ArrowRight className="w-4 h-4" />
