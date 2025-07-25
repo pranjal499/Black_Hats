@@ -90,7 +90,7 @@ const Calendar = () => {
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background scale-55">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
