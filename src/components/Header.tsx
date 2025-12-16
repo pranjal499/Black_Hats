@@ -1,166 +1,129 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Search, Menu, X, Bell, User, Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link, useLocation } from "react-router-dom";
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Menu, X, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
-export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-  const location = useLocation();
+export const Header = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
-    { name: "Home", href: "/", active: location.pathname === "/" },
-    { name: "Calendar", href: "/calendar", active: location.pathname === "/calendar" },
-    { name: "Profile", href: "/profile", active: location.pathname === "/profile" },
-    { name: "Admin", href: "/admin", active: location.pathname === "/admin" },
-    { name: "Docs", href: "/docs", active: location.pathname === "/docs" },
-    { name: "Help", href: "/help", active: location.pathname === "/help" },
+    { name: 'How It Works', href: '#how-it-works' },
+    { name: 'Pricing', href: '#pricing' },
+    { name: 'For Experts', href: '#experts' },
+    { name: 'Login', href: '#login' },
   ];
 
   return (
-    <motion.header 
-      className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border shadow-soft"
+    <motion.header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/20 dark:border-gray-700/20 shadow-lg'
+          : 'bg-transparent'
+      }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/">
-            <motion.div 
-              className="flex items-center space-x-2"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300, duration: 0.2 }}
-            >
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
-                <span className="text-white font-bold text-lg">E</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-accent bg-clip-text text-transparent">
-                EventHub
-              </span>
-            </motion.div>
-          </Link>
+          <motion.div
+            className="flex items-center space-x-2"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              TriHire
+            </span>
+          </motion.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.div
+              <motion.a
                 key={item.name}
+                href={item.href}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
+                transition={{ delay: index * 0.1, duration: 0.3 }}
+                whileHover={{ y: -2 }}
               >
-                <Link
-                  to={item.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 block ${
-                    item.active 
-                      ? "bg-primary text-primary-foreground shadow-medium" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  <motion.span
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="block"
-                  >
-                    {item.name}
-                  </motion.span>
-                </Link>
-              </motion.div>
+                {item.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
+              </motion.a>
             ))}
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden lg:flex items-center relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input 
-              placeholder="Search opportunities..." 
-              className="pl-10 w-80 bg-background/50 border-border/50 focus:border-primary focus:bg-background"
-            />
-          </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="rounded-full hover:bg-accent"
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
-
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent relative">
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full border-2 border-background"></span>
-            </Button>
-
-            {/* User Profile */}
-            <Link to="/profile">
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent">
-                <User className="w-4 h-4" />
+              <Button
+                className="hidden md:inline-flex bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started
               </Button>
-            </Link>
+            </motion.div>
 
             {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden rounded-full"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            <button
+              className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </Button>
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <motion.div
-            className="md:hidden mt-4 pb-4 border-t border-border"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <div className="flex flex-col space-y-2 mt-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    item.active 
-                      ? "bg-primary text-primary-foreground" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="px-4 py-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input 
-                    placeholder="Search opportunities..." 
-                    className="pl-10 bg-background/50"
-                  />
-                </div>
-              </div>
+        <motion.div
+          className={`md:hidden overflow-hidden ${isMobileMenuOpen ? 'max-h-64' : 'max-h-0'}`}
+          animate={{ height: isMobileMenuOpen ? 'auto' : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="py-4 space-y-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg rounded-lg mt-2 border border-gray-200/20 dark:border-gray-700/20">
+            {navItems.map((item, index) => (
+              <motion.a
+                key={item.name}
+                href={item.href}
+                className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.name}
+              </motion.a>
+            ))}
+            <div className="px-4">
+              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-2 rounded-full">
+                Get Started
+              </Button>
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
       </div>
     </motion.header>
   );
-}
+};
