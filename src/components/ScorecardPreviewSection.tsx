@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Star, CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
+import { Star, CircleCheck as CheckCircle, CircleAlert as AlertCircle, TrendingUp } from 'lucide-react';
 
 export const ScorecardPreviewSection = () => {
   const scoreData = [

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, CheckCircle, Users, Clock, Award } from 'lucide-react';
+import { ArrowRight, Play, CircleCheck as CheckCircle, Users, Clock, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const HeroSection = () => {
