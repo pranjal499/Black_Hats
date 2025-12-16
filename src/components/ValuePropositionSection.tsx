@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Shield, BarChart3, Clock, Target } from 'lucide-react';
+import { Shield, ChartBar as BarChart3, Clock, Target } from 'lucide-react';
 
 export const ValuePropositionSection = () => {
   const features = [
